@@ -2,10 +2,11 @@
 
 package main
 
-import(
+import (
 	"context"
-	_"github.com/docker/docker/api/types"
-	_"github.com/docker/docker/api/types/filters"
+	"fmt"
+	"github.com/docker/docker/api/types"
+	_ "github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
 )
 
@@ -16,4 +17,10 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	// コンテナ一覧
+	containers, err := cli.ContainerList(ctx, types.ContainerListOptions{
+		All: true,
+	})
+	fmt.Println(containers)
 }
