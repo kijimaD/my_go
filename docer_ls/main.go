@@ -13,6 +13,7 @@ import (
 func main() {
 	all()
 	project_filter()
+	nest()
 }
 
 func all() {
@@ -48,5 +49,43 @@ func project_filter() {
 		All: true,
 		Filters: labelFilters,
 	})
-	fmt.Println("project filter: ", containers_filtered)
+	fmt.Println("project_filter: ", containers_filtered)
+}
+
+type ServiceContainerMap map[string][]types.Container
+
+func nest() (ServiceContainerMap, error){
+	ctx := context.Background()
+	cli, err := client.NewEnvClient()
+
+	if err != nil {
+		return nil, err
+	}
+
+	// ラベルありのコンテナを取得
+	labelFilters := filters.NewArgs()
+	labelFilters.Add("label", "com.docker.compose.project") // ラベルがついているものすべて
+	containers, err := cli.ContainerList(ctx, types.ContainerListOptions{
+		All: true,
+		Filters: labelFilters,
+	})
+	if err != nil {
+		return nil, err
+	}
+	// fmt.Println(containers)
+	// return nil, err
+
+	// プロジェクトでグループ化
+	containersByProject := ServiceContainerMap{}
+	for _, container := range containers {
+		label := container.Labels["com.docker.compose.project"]
+		cons := containersByProject[label]
+		if cons == nil {
+			cons = []types.Container{}
+		}
+		cons = append(cons, container)
+		containersByProject[label] = cons
+	}
+	fmt.Println("grouping: ", containersByProject)
+	return containersByProject, nil
 }
