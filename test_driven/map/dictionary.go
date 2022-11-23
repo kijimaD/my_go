@@ -54,3 +54,8 @@ func (d Dictionary) Update(word, definition string) error {
 
 	return nil
 }
+
+// 存在しない値を削除しても効果がないので、errorを返す必要はない
+func (d Dictionary) Delete(word string) {
+	delete(d, word)
+}
