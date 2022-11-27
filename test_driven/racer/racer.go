@@ -18,5 +18,5 @@ func Racer(a, b string) (winner string) {
 		return a
 	}
 
-	return
+	return b
 }
