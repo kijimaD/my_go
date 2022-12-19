@@ -6,20 +6,18 @@ import (
 	"strings"
 )
 
-func PlayerServer(w http.ResponseWriter, r *http.Request) {
-	player := strings.TrimPrefix(r.URL.Path, "/players/")
-
-	fmt.Fprint(w, GetPlayerScore(player))
+type PlayerStore interface {
+	GetPlayerScore(name string) int
 }
 
-func GetPlayerScore(name string) string {
-	if name == "Pepper" {
-		return "20"
-	}
+type PlayerServer struct {
+	Store PlayerStore
+}
 
-	if name == "Floyd" {
-		return "10"
-	}
+func (p *PlayerServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	player := strings.TrimPrefix(r.URL.Path, "/players/")
 
-	return ""
+	w.WriteHeader(http.StatusNotFound)
+
+	fmt.Fprint(w, p.Store.GetPlayerScore(player))
 }
