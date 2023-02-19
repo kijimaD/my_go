@@ -2,6 +2,7 @@ package progress
 
 import (
 	"context"
+	"fmt"
 	"sync"
 	"time"
 
@@ -28,6 +29,10 @@ func FromContext(ctx context.Context, opts ...WriterOption) WriterFactory {
 		ctx = context.WithValue(ctx, contextKey, pw)
 		return pw, true, ctx
 	}
+}
+
+func NewFromContext(ctx context.Context, opts ...WriterOption) (Writer, bool, context.Context) {
+	return FromContext(ctx, opts...)(ctx)
 }
 
 type Writer interface {
@@ -126,5 +131,49 @@ func (pr *progressReader) append(pw *progressWriter) {
 		return
 	default:
 		pr.writers[pw] = struct{}{}
+	}
+}
+
+type Status struct {
+	Action    string
+	Current   int
+	Total     int
+	Started   *time.Time
+	Completed *time.Time
+}
+
+func oneOffProgress(ctx context.Context, id string) func(err error) error {
+	pw, _, _ := NewFromContext(ctx)
+	now := time.Now()
+	st := Status{
+		Started: &now,
+	}
+	fmt.Println(id, st)
+	_ = pw.Write(id, st)
+
+	return func(err error) error {
+		// TODO: set error on status
+		now := time.Now()
+		st.Completed = &now
+		_ = pw.Write(id, st)
+		_ = pw.Close()
+		return err
+	}
+}
+
+func OneOff(ctx context.Context, id string) func(err error) error {
+	pw, _, _ := NewFromContext(ctx)
+	now := time.Now()
+	st := Status{
+		Started: &now,
+	}
+	pw.Write(id, st)
+	return func(err error) error {
+		// TODO: set error on status
+		now := time.Now()
+		st.Completed = &now
+		pw.Write(id, st)
+		pw.Close()
+		return err
 	}
 }
