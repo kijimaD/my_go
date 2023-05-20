@@ -4,7 +4,10 @@ go 1.17
 
 require golang.org/x/tools v0.3.0
 
-require github.com/gostaticanalysis/forcetypeassert v0.1.0 // indirect
+require (
+	github.com/gorilla/websocket v1.5.0 // indirect
+	github.com/gostaticanalysis/forcetypeassert v0.1.0 // indirect
+)
 
 require (
 	github.com/pkg/errors v0.9.1
