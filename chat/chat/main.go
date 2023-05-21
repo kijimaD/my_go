@@ -77,6 +77,10 @@ func main() {
 		w.Header()["location"] = []string{"/chat"}
 		w.WriteHeader(http.StatusTemporaryRedirect)
 	})
+	// ファイルサーバ
+	http.Handle(
+		"/avatars/",
+		http.StripPrefix("/avatars/", http.FileServer(http.Dir("./avatars"))))
 	go r.run()
 	log.Println("Webサーバを開始します。ポート:", *addr)
 	if err := http.ListenAndServe(*addr, nil); err != nil {
