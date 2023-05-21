@@ -17,6 +17,8 @@ import (
 	"github.com/stretchr/objx"
 )
 
+var avatars Avatar = UseFileSystemAvatar
+
 type Env struct {
 	GOOGLE_SECRETKEY string `envconfig:"GOOGLE_SECRETKEY" default:""`
 	GOOGLE_CLIENTID  string `envconfig:"GOOGLE_CLIENTID" default:""`
@@ -58,9 +60,7 @@ func main() {
 		google.New(env.GOOGLE_CLIENTID, env.GOOGLE_SECRETKEY, "http://localhost:8080/auth/callback/google"),
 	)
 
-	r := newRoom(UseAuthAvatar)
-	// r := newRoom(UseGravatar)
-	// r := newRoom(UseFileSystemAvatar)
+	r := newRoom()
 	r.tracer = trace.New(os.Stdout)
 	http.Handle("/chat", MustAuth(&templateHandler{filename: "chat.html"}))
 	http.Handle("/login", &templateHandler{filename: "login.html"})
