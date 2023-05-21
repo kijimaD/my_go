@@ -55,6 +55,23 @@ func TestFileSystemAvatar(t *testing.T) {
 		t.Error("FileSystemAvatar.GetAvatarURLはエラーを返すべきでありません")
 	}
 	if url != "/avatars/abc.jpg" {
-		t.Error("FileSystemAvatar.GetAvatarURLが%sという誤った値を返しました", url)
+		t.Errorf("FileSystemAvatar.GetAvatarURLが%sという誤った値を返しました", url)
+	}
+}
+
+func TestFileSystemAvatarPNG(t *testing.T) {
+	filename := filepath.Join("avatars", "abc.png")
+	ioutil.WriteFile(filename, []byte{}, 0777)
+	defer func() { os.Remove(filename) }()
+
+	var fileSystemAvatar FileSystemAvatar
+	client := new(client)
+	client.userData = map[string]interface{}{"userid": "abc"}
+	url, err := fileSystemAvatar.GetAvatarURL(client)
+	if err != nil {
+		t.Error("FileSystemAvatar.GetAvatarURLはエラーを返すべきでありません")
+	}
+	if url != "/avatars/abc.png" {
+		t.Errorf("FileSystemAvatar.GetAvatarURLが%sという誤った値を返しました", url)
 	}
 }
