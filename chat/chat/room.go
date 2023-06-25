@@ -92,6 +92,6 @@ func (r *room) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 	r.join <- client
 	defer func() { r.leave <- client }()
-	go client.write()
-	client.read() // 接続は保持され、終了を指示されるまで他の処理をブロックする
+	go client.write() // c.sendの内容をwebsocketに書き込む
+	client.read()     // 接続は保持され、終了を指示されるまで他の処理をブロックする
 }

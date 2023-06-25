@@ -1,0 +1,1 @@
+GOSSAFUNC=main go build
